@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IP 국가 조회기 - Country Finder</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 30px;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .input-section {
+            margin-bottom: 30px;
+        }
+        
+        .input-section label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        textarea {
+            width: 100%;
+            min-height: 150px;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            resize: vertical;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-secondary {
+            background: #48bb78;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #38a169;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(72, 187, 120, 0.4);
+        }
+        
+        .btn-tertiary {
+            background: #ed8936;
+            color: white;
+        }
+        
+        .btn-tertiary:hover {
+            background: #dd6b20;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(237, 137, 54, 0.4);
+        }
+        
+        .btn-clear {
+            background: #e53e3e;
+            color: white;
+        }
+        
+        .btn-clear:hover {
+            background: #c53030;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(229, 62, 62, 0.4);
+        }
+        
+        .results-section {
+            margin-top: 30px;
+        }
+        
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .results-header h2 {
+            color: #333;
+        }
+        
+        .stats {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+        
+        thead {
+            background: #667eea;
+            color: white;
+        }
+        
+        th {
+            padding: 12px;
+            text-align: left;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+        
+        th input[type="checkbox"] {
+            cursor: pointer;
+        }
+        
+        td {
+            padding: 12px;
+            border-top: 1px solid #eee;
+        }
+        
+        tbody tr:hover {
+            background: #f7fafc;
+        }
+        
+        .column-selector {
+            margin-bottom: 15px;
+            padding: 15px;
+            background: #f7fafc;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+        
+        .column-selector label {
+            display: inline-block;
+            margin-right: 20px;
+            margin-bottom: 5px;
+        }
+        
+        .column-selector input[type="checkbox"] {
+            margin-right: 5px;
+            cursor: pointer;
+        }
+        
+        .api-section {
+            margin-top: 40px;
+            padding: 20px;
+            background: #f7fafc;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .api-section h3 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+        
+        .code-block {
+            background: #2d3748;
+            color: #68d391;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin-bottom: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+        
+        .error {
+            background: #fed7d7;
+            color: #c53030;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 4px solid #e53e3e;
+        }
+        
+        .success {
+            background: #c6f6d5;
+            color: #22543d;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 4px solid #48bb78;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌍 IP 국가 조회기</h1>
+        <p class="subtitle">대량 IP 주소의 국가 정보를 조회하고 내보내기 (오프라인 지원)</p>
+        
+        <div class="input-section">
+            <label for="ipInput">IP 주소 입력 (한 줄에 하나씩 입력):</label>
+            <textarea id="ipInput" placeholder="예시:&#10;8.8.8.8&#10;1.1.1.1&#10;208.67.222.222&#10;180.70.102.148"></textarea>
+        </div>
+        
+        <div class="button-group">
+            <button class="btn-primary" onclick="lookupIPs()">🔍 조회하기</button>
+            <button class="btn-secondary" onclick="copyToClipboard()">📋 복사하기</button>
+            <button class="btn-tertiary" onclick="exportToCSV()">📥 CSV 내보내기</button>
+            <button class="btn-clear" onclick="clearResults()">🗑️ 초기화</button>
+        </div>
+        
+        <div id="message"></div>
+        
+        <div class="column-selector">
+            <strong>내보낼 컬럼 선택:</strong><br><br>
+            <label><input type="checkbox" id="col-ip" checked> IP 주소</label>
+            <label><input type="checkbox" id="col-country" checked> 국가명 (한글)</label>
+            <label><input type="checkbox" id="col-code" checked> 국가코드</label>
+            <label><input type="checkbox" id="col-continent" checked> 대륙</label>
+        </div>
+        
+        <div class="results-section">
+            <div class="results-header">
+                <h2>조회 결과</h2>
+                <div class="stats" id="stats"></div>
+            </div>
+            <div class="table-container">
+                <table id="resultsTable">
+                    <thead>
+                        <tr>
+                            <th><input type="checkbox" id="selectAll" onchange="toggleSelectAll()"></th>
+                            <th>IP 주소</th>
+                            <th>국가명 (한글)</th>
+                            <th>국가코드</th>
+                            <th>대륙</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resultsBody">
+                        <tr>
+                            <td colspan="5" style="text-align: center; color: #999; padding: 40px;">
+                                IP 주소를 입력하고 "조회하기" 버튼을 클릭하세요.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div class="api-section">
+            <h3>📡 API 사용 방법</h3>
+            <p style="margin-bottom: 15px;">JavaScript로 프로그래밍 방식으로 사용할 수 있습니다:</p>
+            
+            <div class="code-block">
+// 단일 IP 조회
+const result = CountryFinderAPI.lookup('8.8.8.8');
+console.log(result);
+// { ip: '8.8.8.8', country: '미국', code: 'US', continent: '북아메리카' }
+            </div>
+            
+            <div class="code-block">
+// 여러 IP 조회
+const ips = ['8.8.8.8', '1.1.1.1', '208.67.222.222'];
+const results = CountryFinderAPI.lookupBulk(ips);
+console.log(results);
+            </div>
+            
+            <div class="code-block">
+// Excel VBA에서 사용 (Internet Explorer 객체 사용)
+' 웹 페이지를 로드하고 JavaScript 함수 호출
+Dim IE As Object
+Set IE = CreateObject("InternetExplorer.Application")
+IE.Navigate "file:///C:/path/to/index.html"
+' 페이지 로드 후
+result = IE.Document.parentWindow.CountryFinderAPI.lookup("8.8.8.8")
+            </div>
+        </div>
+    </div>
+    
+    <script src="ip-database.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
